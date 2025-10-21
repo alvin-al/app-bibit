@@ -18,12 +18,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 //Form schema
-const formSchema = z.object({
-  email: z.email({
-    message: "Please enter valid email address",
-  }),
-  password: z.string().min(8, { message: "Password is required." }),
-});
+const formSchema = z
+  .object({
+    email: z.email({
+      message: "Please enter valid email address",
+    }),
+    password: z.string().min(8, { message: "Password is required." }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password do not match",
+    path: ["confirmPassword"],
+  });
 
 const page = () => {
   const router = useRouter();
@@ -40,7 +46,7 @@ const page = () => {
 
   //Submit handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
     });
@@ -50,8 +56,12 @@ const page = () => {
       return;
     }
 
+    toast.success(
+      "Registration successful! Please check your email to confirm."
+    );
+
     router.refresh();
-    router.push("/");
+    router.push("/login");
   }
 
   return (
@@ -85,6 +95,19 @@ const page = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type='password' placeholder='********' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='confirmPassword'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
                   <Input type='password' placeholder='********' {...field} />
                 </FormControl>
