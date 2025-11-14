@@ -31,7 +31,7 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-const page = () => {
+const Register = () => {
   const router = useRouter();
   const supabase = createClient();
 
@@ -128,4 +128,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Register;
