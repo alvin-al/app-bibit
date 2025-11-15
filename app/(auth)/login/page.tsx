@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { useAuthStore } from "@/lib/store/authStore";
 
 //Form schema
 const formSchema = z.object({
@@ -29,6 +30,7 @@ const API_URL = "http://localhost:4000/api/auth";
 
 const Login = () => {
   const router = useRouter();
+  const { setToken, token } = useAuthStore();
 
   //Form with RHF
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,7 +48,8 @@ const Login = () => {
 
       toast.success("Login berhasil");
 
-      console.log(response.data.token);
+      setToken(response.data.token);
+      console.log(token);
       router.push("/");
     } catch (err) {
       console.log(err);
