@@ -1,5 +1,6 @@
 "use client";
 import AuthGuard from "@/components/AuthGuard";
+import DeleteButton from "@/components/DeleteButton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,8 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { useAuthStore } from "@/lib/store/authStore";
 import axios from "axios";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -48,7 +51,7 @@ const page = () => {
         if (response) setProducts(response.data.data);
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          toast(err.response.data.message);
+          toast.error(err.response.data.message);
         }
       } finally {
         setLoading(false);
@@ -58,7 +61,35 @@ const page = () => {
     getProducts();
   }, [token]);
 
-  const loadingText = <>Loading Data</>;
+  //Delete product
+  const deleteProduct = async (id: string) => {
+    try {
+      if (!token) return;
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setProducts((prev) => prev.filter((item) => item.id !== id));
+
+      toast.success("Produk berhasil dihapus");
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      }
+    }
+  };
+
+  const loadingText = (
+    <div className='flex justify-center gap-2 items-center text-2xl h-[80vh]'>
+      <Spinner />
+      <p>Loading Data</p>{" "}
+    </div>
+  );
   const productsNotFound = <>Products not found</>;
 
   return (
@@ -74,11 +105,18 @@ const page = () => {
       </div>
       {/* Products item */}
       <div className='p-4'>
+        <div className='mb-4'>
+          <Link href={"/dashboard/create"}>
+            <Button className='cursor-pointer' variant='outline'>
+              Tambah produk
+            </Button>
+          </Link>
+        </div>
         {loading && loadingText}{" "}
         {!loading && products.length === 0 && productsNotFound}
         <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
           {products.map((item) => (
-            <Card key={item.id} className='hover:shadow-lg transition-shadow '>
+            <Card key={item.id} className='hover:shadow-lg transition-shadow'>
               <CardHeader>
                 <CardTitle>{item.name}</CardTitle>
                 <CardDescription>{item.description}</CardDescription>
@@ -89,6 +127,18 @@ const page = () => {
                   <span className='text-green-600'>
                     Rp{item.price.toLocaleString("id-ID")}
                   </span>
+                </div>
+                <div className='mt-4 space-x-2 flex'>
+                  {" "}
+                  <Link key={item.id} href={`/dashboard/edit/${item.id}`}>
+                    <Button variant='secondary' className='cursor-pointer'>
+                      Edit
+                    </Button>
+                  </Link>
+                  <DeleteButton
+                    title={item.name}
+                    onClick={() => deleteProduct(item.id)}
+                  />
                 </div>
               </CardContent>
             </Card>

@@ -98,13 +98,13 @@ const EditProductPage = () => {
         }
       );
 
-      toast("Produk berhasil diedit!");
+      toast.success("Produk berhasil diedit!");
       router.push("/dashboard");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        toast(error.response.data.message);
+        toast.error(error.response.data.message);
       }
-      toast("Terjadi kesalahan");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +154,10 @@ const EditProductPage = () => {
                       type='number'
                       placeholder='Stok barang'
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const val = e.target.valueAsNumber;
+                        field.onChange(Number.isNaN(val) ? 0 : val);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -172,7 +175,10 @@ const EditProductPage = () => {
                       type='number'
                       placeholder='Harga barang'
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const val = e.target.valueAsNumber;
+                        field.onChange(Number.isNaN(val) ? 0 : val);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
