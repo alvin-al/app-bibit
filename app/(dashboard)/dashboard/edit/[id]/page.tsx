@@ -14,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/lib/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -28,11 +28,12 @@ const productSchema = z.object({
   imageUrl: z.url("URL tidak valid").optional().or(z.literal("")),
 });
 
-const page = () => {
+const EditProductPage = () => {
   //state
   const { token } = useAuthStore();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
+  const { id } = useParams();
 
   //setup RHF
   const form = useForm({
@@ -46,17 +47,58 @@ const page = () => {
     },
   });
 
+  //get old data
+  useEffect(() => {
+    setIsLoading(true);
+    const getSelectedProduct = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        //store data
+        const productData = response.data.data;
+
+        //fill data
+        form.reset({
+          name: productData.name,
+          description: productData.description || "",
+          price: productData.price,
+          stock: productData.stock,
+          imageUrl: productData.imageUrl || "",
+        });
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          toast(error.message);
+        } else {
+          toast("Terjadi kesalahan");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (token && id) getSelectedProduct();
+  }, [id, token, form, router]);
+
   //onsubmit
   const onSubmit = async (values: z.infer<typeof productSchema>) => {
     setIsLoading(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/products`, values, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      toast("Produk berhasil ditambahkan!");
+      toast("Produk berhasil diedit!");
       router.push("/dashboard");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -72,7 +114,7 @@ const page = () => {
     <AuthGuard>
       <div className='p-4'>
         {" "}
-        <div className='font-medium text-2xl mb-4'>Tambah Produk</div>
+        <h1 className='font-medium text-2xl mb-4'>Edit Produk</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
             <FormField
@@ -164,4 +206,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default EditProductPage;
