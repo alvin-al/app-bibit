@@ -65,7 +65,7 @@ const page = () => {
     <AuthGuard>
       {/* Header */}
       <div className='h-12 w-full shadow px-4 flex items-center justify-between'>
-        <span>Berbenih</span>
+        <span className='font-semibold'>Berbenih</span>
         <span>
           <Button className='cursor-pointer' onClick={() => logout()}>
             Logout
