@@ -5,29 +5,19 @@ import { useRouter } from "next/navigation";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isHydrate, setIsHydrate] = useState<boolean>(false);
   const router = useRouter();
 
   const { token } = useAuthStore();
 
   useEffect(() => {
-    setIsHydrate(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isHydrate) {
-      return;
-    }
-
     if (token === null) {
-      router.push("/login");
-      setIsLoading(false);
+      return router.push("/login");
     }
 
     setIsLoading(false);
   }, []);
 
-  if (!isHydrate && isLoading) {
+  if (isLoading) {
     return <p>Loading</p>;
   }
 
