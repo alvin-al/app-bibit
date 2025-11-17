@@ -5,23 +5,31 @@ import { useRouter } from "next/navigation";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isMounted, setIsMounted] = useState<boolean>(false); // 1. Tambah ini
   const router = useRouter();
 
   const { token } = useAuthStore();
 
+  //check component mounted
   useEffect(() => {
-    if (token === null) {
-      return router.push("/login");
-    }
-
-    setIsLoading(false);
+    setIsMounted(true);
   }, []);
 
-  if (isLoading) {
-    return <p>Loading</p>;
+  useEffect(() => {
+    if (!isMounted) return;
+
+    if (token === null) {
+      router.replace("/login");
+    } else {
+      setIsLoading(false);
+    }
+  }, [token, router, isMounted]);
+
+  if (!isMounted || isLoading) {
+    return <p>Loading...</p>;
   }
 
-  return <div>{children}</div>;
+  return <>{children}</>;
 };
 
 export default AuthGuard;

@@ -26,8 +26,6 @@ const formSchema = z.object({
   password: z.string().min(8, { message: "Password is required." }),
 });
 
-const API_URL = "http://localhost:4000/api/auth";
-
 const Login = () => {
   const router = useRouter();
   const { setToken, token } = useAuthStore();
@@ -44,13 +42,16 @@ const Login = () => {
   //Submit handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await axios.post(`${API_URL}/login`, values);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        values
+      );
 
       toast.success("Login berhasil");
 
       setToken(response.data.token);
       console.log(token);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       console.log(err);
       if (axios.isAxiosError(err) && err.response) {
