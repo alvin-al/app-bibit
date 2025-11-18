@@ -28,16 +28,11 @@ const DeleteButton = ({ onClick, title }: DeleteButtonType) => {
           </CardHeader>
           <CardContent className='flex justify-end space-x-4'>
             {" "}
-            <Button
-              variant='secondary'
-              className='cursor-pointer'
-              onClick={() => setIsOpen(!isOpen)}
-            >
+            <Button variant='secondary' onClick={() => setIsOpen(!isOpen)}>
               Batal
             </Button>
             <Button
               variant='destructive'
-              className='cursor-pointer'
               onClick={() => {
                 onClick();
                 setIsOpen(!isOpen);
@@ -54,11 +49,7 @@ const DeleteButton = ({ onClick, title }: DeleteButtonType) => {
   return (
     <>
       {" "}
-      <Button
-        variant='destructive'
-        className='cursor-pointer'
-        onClick={() => setIsOpen(!isOpen)}
-      >
+      <Button variant='destructive' onClick={() => setIsOpen(!isOpen)}>
         Hapus
       </Button>
       {isOpen && deleteCard}

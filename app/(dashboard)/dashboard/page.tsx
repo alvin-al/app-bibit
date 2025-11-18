@@ -114,18 +114,14 @@ const Dashboard = () => {
       <div className='h-12 w-full shadow px-4 flex items-center justify-between'>
         <span className='font-semibold'>Berbenih</span>
         <span>
-          <Button className='cursor-pointer' onClick={() => logout()}>
-            Logout
-          </Button>
+          <Button onClick={() => logout()}>Logout</Button>
         </span>
       </div>
       {/* Products item */}
       <div className='p-4'>
         <div className='mb-4'>
           <Link href={"/dashboard/create"}>
-            <Button className='cursor-pointer' variant='outline'>
-              Tambah produk
-            </Button>
+            <Button variant='outline'>Tambah produk</Button>
           </Link>
         </div>
         {loading && loadingText}{" "}
@@ -161,7 +157,7 @@ const Dashboard = () => {
                 <div className='mt-4 space-x-2 flex'>
                   {" "}
                   <Link key={item.id} href={`/dashboard/edit/${item.id}`}>
-                    <Button variant='secondary' className='cursor-pointer'>
+                    <Button variant='secondary'>
                       Edit
                     </Button>
                   </Link>
