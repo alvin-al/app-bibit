@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/store/authStore";
 import { useRouter } from "next/navigation";
+import { Spinner } from "./ui/spinner";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -26,7 +27,12 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   }, [token, router, isMounted]);
 
   if (!isMounted || isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className='w-screen h-screen flex justify-center items-center gap-3'>
+        <Spinner />
+        <p>Memuat halaman</p>
+      </div>
+    );
   }
 
   return <>{children}</>;

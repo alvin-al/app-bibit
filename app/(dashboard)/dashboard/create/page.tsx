@@ -15,7 +15,7 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -32,6 +32,8 @@ const CreateProductPage = () => {
   //state
   const { token } = useAuthStore();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
 
   //setup RHF
@@ -46,23 +48,57 @@ const CreateProductPage = () => {
     },
   });
 
+  //handle file change
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const fileData = e.target.files[0];
+      setFile(fileData);
+
+      const preview = URL.createObjectURL(fileData);
+      setPreviewImage(preview);
+    }
+  };
+
   //onsubmit
   const onSubmit = async (values: z.infer<typeof productSchema>) => {
     setIsLoading(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/products`, values, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      let finalImageUrl = values.imageUrl;
+
+      if (file) {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const uploadRes = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/upload`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        finalImageUrl = uploadRes.data.url;
+      }
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/products`,
+        { ...values, imageUrl: finalImageUrl },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       toast("Produk berhasil ditambahkan!");
       router.push("/dashboard");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        toast(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        toast("Terjadi kesalahan");
+        toast.error("Terjadi kesalahan");
       }
     } finally {
       setIsLoading(false);
@@ -114,6 +150,7 @@ const CreateProductPage = () => {
                       placeholder='Stok barang'
                       {...field}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      value={(field.value as number) ?? 0}
                     />
                   </FormControl>
                   <FormMessage />
@@ -132,25 +169,34 @@ const CreateProductPage = () => {
                       placeholder='Harga barang'
                       {...field}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      value={(field.value as number) ?? 0}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />{" "}
-            <FormField
-              control={form.control}
-              name={"imageUrl"}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL Foto</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Foto' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div>
+              <FormLabel>URL Foto</FormLabel>
+              <FormControl>
+                <Input
+                  type='file'
+                  placeholder='Foto'
+                  onChange={(e) => handleFileChange(e)}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+            {previewImage && (
+              <div className='mt-2'>
+                <img
+                  src={previewImage}
+                  alt='Preview'
+                  className='w-32 h-32 object-cover rounded-md border'
+                  key={previewImage ? "loaded" : "empty"}
+                />
+              </div>
+            )}
             {isLoading ? (
               <Button type='submit' disabled>
                 Loading

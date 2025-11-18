@@ -1,10 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -16,6 +15,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useAuthStore } from "@/lib/store/authStore";
+import { Spinner } from "@/components/ui/spinner";
 
 //Form schema
 const formSchema = z
@@ -33,7 +35,19 @@ const formSchema = z
 
 const Register = () => {
   const router = useRouter();
-  const supabase = createClient();
+  const [isChecking, setIsChecking] = useState<boolean>(true);
+  const { token } = useAuthStore();
+
+  //check if user login
+  useEffect(() => {
+    if (token) {
+      router.replace("/dashboard");
+    } else {
+      setTimeout(() => {
+        setIsChecking(false);
+      }, 500);
+    }
+  }, [token, router]);
 
   //Form with RHF
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,22 +60,31 @@ const Register = () => {
 
   //Submit handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-    });
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        values
+      );
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      toast.success("Pendaftaran berhasil! Silahkan login dengan akun anda");
+
+      router.push("/login");
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Terjadi kesalahan saat mendaftar");
+      }
     }
+  }
 
-    toast.success(
-      "Registration successful! Please check your email to confirm."
+  //Loading animation
+  if (isChecking) {
+    return (
+      <div className='w-screen h-screen flex justify-center items-center'>
+        <Spinner />
+      </div>
     );
-
-    router.refresh();
-    router.push("/login");
   }
 
   return (

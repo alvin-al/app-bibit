@@ -12,7 +12,9 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthStore } from "@/lib/store/authStore";
 import axios from "axios";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -27,15 +29,15 @@ interface Product {
   seller?: string;
 }
 
-const page = () => {
+const Dashboard = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { token, logout } = useAuthStore();
+  const router = useRouter();
 
   //Get products
   useEffect(() => {
     setLoading(true);
-
     const getProducts = async () => {
       try {
         if (!token) return;
@@ -52,6 +54,12 @@ const page = () => {
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
           toast.error(err.response.data.message);
+
+          //logout when token expired
+          if (err.response.status === 401) {
+            logout();
+            router.replace("/login");
+          }
         }
       } finally {
         setLoading(false);
@@ -59,20 +67,17 @@ const page = () => {
     };
 
     getProducts();
-  }, [token]);
+  }, [token, router, logout]);
 
   //Delete product
   const deleteProduct = async (id: string) => {
     try {
       if (!token) return;
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setProducts((prev) => prev.filter((item) => item.id !== id));
 
@@ -85,12 +90,23 @@ const page = () => {
   };
 
   const loadingText = (
-    <div className='flex justify-center gap-2 items-center text-2xl h-[80vh]'>
+    <div className='flex justify-center gap-2 items-center h-[80vh]'>
       <Spinner />
       <p>Loading Data</p>{" "}
     </div>
   );
-  const productsNotFound = <>Products not found</>;
+  const productsNotFound = (
+    <div className='flex w-full h-[80vh] justify-center items-center flex-col'>
+      <Image
+        src='/noProduct.png'
+        width={300}
+        height={300}
+        alt='Not product image'
+        priority
+      />
+      <p className='font-medium text-lg'>Products not found</p>
+    </div>
+  );
 
   return (
     <AuthGuard>
@@ -118,6 +134,20 @@ const page = () => {
           {products.map((item) => (
             <Card key={item.id} className='hover:shadow-lg transition-shadow'>
               <CardHeader>
+                <div className='w-32 h-32 mb-4 border rounded-lg overflow-hidden relative'>
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.name}
+                      fill
+                      className='object-cover'
+                    />
+                  ) : (
+                    <div className='w-full h-full flex justify-center items-center text-xs text-gray-500'>
+                      No Image
+                    </div>
+                  )}
+                </div>
                 <CardTitle>{item.name}</CardTitle>
                 <CardDescription>{item.description}</CardDescription>
               </CardHeader>
@@ -149,4 +179,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Dashboard;

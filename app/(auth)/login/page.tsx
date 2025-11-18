@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useAuthStore } from "@/lib/store/authStore";
+import { Spinner } from "@/components/ui/spinner";
 
 //Form schema
 const formSchema = z.object({
@@ -27,8 +28,20 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-  const router = useRouter();
+  const [isChecking, setIsChecking] = useState<boolean>(true);
   const { setToken, token } = useAuthStore();
+  const router = useRouter();
+
+  //check if user login
+  useEffect(() => {
+    if (token) {
+      router.replace("/dashboard");
+    } else {
+      setTimeout(() => {
+        setIsChecking(false);
+      }, 500);
+    }
+  }, [token, router]);
 
   //Form with RHF
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,6 +72,15 @@ const Login = () => {
       }
       toast.error("Login gagal");
     }
+  }
+
+  //Loading animation
+  if (isChecking) {
+    return (
+      <div className='w-screen h-screen flex justify-center items-center'>
+        <Spinner />
+      </div>
+    );
   }
 
   return (
@@ -104,7 +126,13 @@ const Login = () => {
             className='w-full'
             disabled={form.formState.isSubmitting}
           >
-            {form.formState.isSubmitting ? "Loading" : "Submit"}
+            {form.formState.isSubmitting ? (
+              <>
+                <Spinner /> Loading
+              </>
+            ) : (
+              "Submit"
+            )}
           </Button>
         </form>
       </Form>
