@@ -101,10 +101,12 @@ const Dashboard = () => {
   return (
     <AuthGuard>
       {/* Header */}
-      <div className='h-12 w-full shadow px-4 flex items-center justify-between'>
+      <div className='flex h-16 items-center justify-between px-8 shadow bg-white'>
         <span className='font-semibold'>Berbenih</span>
         <span>
-          <Button onClick={() => logout()}>Logout</Button>
+          <Button onClick={() => logout()} variant='outline'>
+            Logout
+          </Button>
         </span>
       </div>
       {/* Products item */}
