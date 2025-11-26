@@ -20,14 +20,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-
-const productSchema = z.object({
-  name: z.string().min(1, "Nama produk harap diisi"),
-  description: z.string(),
-  price: z.coerce.number().min(1, "Harga tidak boleh kosong"),
-  stock: z.coerce.number().min(0, "Stok harus angka"),
-  imageUrl: z.url("URL tidak valid").optional().or(z.literal("")),
-});
+import { productSchema } from "@/lib/schemas/productSchema";
 
 const EditProductPage = () => {
   //state
@@ -47,6 +40,9 @@ const EditProductPage = () => {
       price: 0,
       stock: 0,
       imageUrl: "",
+      age: "",
+      unit: "",
+      varieties: "",
     },
   });
 
@@ -72,6 +68,9 @@ const EditProductPage = () => {
           price: productData.price,
           stock: productData.stock,
           imageUrl: productData.imageUrl || "",
+          age: productData.age || "",
+          unit: productData.unit || "Pcs",
+          varieties: productData.varieties || "",
         });
 
         setPreviewImage(productData.imageUrl || null);
@@ -156,7 +155,9 @@ const EditProductPage = () => {
               name={"name"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama produk</FormLabel>
+                  <FormLabel>
+                    Nama produk<span className='text-red-500'>*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder='Nama barang' {...field} />
                   </FormControl>
@@ -171,7 +172,10 @@ const EditProductPage = () => {
                 <FormItem>
                   <FormLabel>Deskripsi produk</FormLabel>
                   <FormControl>
-                    <Textarea placeholder='Deskripsi barang' {...field} />
+                    <Textarea
+                      placeholder='Misalnya : Tinggi bibit, kondisi bibit'
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -182,17 +186,16 @@ const EditProductPage = () => {
               name={"stock"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Stok barang</FormLabel>
+                  <FormLabel>
+                    Stok barang<span className='text-red-500'>*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type='number'
                       placeholder='Stok barang'
                       {...field}
-                      onChange={(e) => {
-                        const val = e.target.valueAsNumber;
-                        field.onChange(Number.isNaN(val) ? 0 : val);
-                      }}
-                      value={field.value ? Number(field.value) : 0}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      value={(field.value as number) ?? 0}
                     />
                   </FormControl>
                   <FormMessage />
@@ -204,25 +207,70 @@ const EditProductPage = () => {
               name={"price"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Harga barang</FormLabel>
+                  <FormLabel>
+                    Harga barang<span className='text-red-500'>*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type='number'
                       placeholder='Harga barang'
                       {...field}
-                      onChange={(e) => {
-                        const val = e.target.valueAsNumber;
-                        field.onChange(Number.isNaN(val) ? 0 : val);
-                      }}
-                      value={field.value ? Number(field.value) : 0}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      value={(field.value as number) ?? 0}
+                      required
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />{" "}
+            <FormField
+              control={form.control}
+              name={"age"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Umur barang<span className='text-red-500'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='Misal : 2 minggu' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />{" "}
+            <FormField
+              control={form.control}
+              name={"unit"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Unit satuan<span className='text-red-500'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='Misal : Pcs' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />{" "}
+            <FormField
+              control={form.control}
+              name={"varieties"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Varietas<span className='text-red-500'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='Misalnya : F1' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div>
-              <FormLabel>URL Foto</FormLabel>
+              <FormLabel className='mb-2'>URL Foto</FormLabel>
               <FormControl>
                 <Input
                   type='file'
@@ -244,7 +292,7 @@ const EditProductPage = () => {
             )}
             {isLoading ? (
               <Button type='submit' disabled>
-                <Spinner /> Loading
+                Loading
               </Button>
             ) : (
               <Button type='submit'>Submit</Button>

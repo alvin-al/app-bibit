@@ -19,14 +19,7 @@ import React, { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-
-const productSchema = z.object({
-  name: z.string().min(1, "Nama produk harap diisi"),
-  description: z.string(),
-  price: z.coerce.number().min(1, "Harga tidak boleh kosong"),
-  stock: z.coerce.number().min(0, "Stok harus angka"),
-  imageUrl: z.url("URL tidak valid").optional().or(z.literal("")),
-});
+import { productSchema } from "@/lib/schemas/productSchema";
 
 const CreateProductPage = () => {
   //state
@@ -45,6 +38,9 @@ const CreateProductPage = () => {
       price: 0,
       stock: 0,
       imageUrl: "",
+      age: "",
+      unit: "",
+      varieties: "",
     },
   });
 
@@ -117,7 +113,9 @@ const CreateProductPage = () => {
               name={"name"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama produk</FormLabel>
+                  <FormLabel>
+                    Nama produk<span className='text-red-500'>*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder='Nama barang' {...field} />
                   </FormControl>
@@ -132,7 +130,10 @@ const CreateProductPage = () => {
                 <FormItem>
                   <FormLabel>Deskripsi produk</FormLabel>
                   <FormControl>
-                    <Textarea placeholder='Deskripsi barang' {...field} />
+                    <Textarea
+                      placeholder='Misalnya : Tinggi bibit, kondisi bibit'
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,7 +144,9 @@ const CreateProductPage = () => {
               name={"stock"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Stok barang</FormLabel>
+                  <FormLabel>
+                    Stok barang<span className='text-red-500'>*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type='number'
@@ -162,7 +165,9 @@ const CreateProductPage = () => {
               name={"price"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Harga barang</FormLabel>
+                  <FormLabel>
+                    Harga barang<span className='text-red-500'>*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type='number'
@@ -170,14 +175,60 @@ const CreateProductPage = () => {
                       {...field}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       value={(field.value as number) ?? 0}
+                      required
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />{" "}
+            <FormField
+              control={form.control}
+              name={"age"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Umur barang<span className='text-red-500'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='Misal : 2 minggu' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />{" "}
+            <FormField
+              control={form.control}
+              name={"unit"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Unit satuan<span className='text-red-500'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='Misal : Pcs' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />{" "}
+            <FormField
+              control={form.control}
+              name={"varieties"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Varietas<span className='text-red-500'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='Misalnya : F1' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div>
-              <FormLabel>URL Foto</FormLabel>
+              <FormLabel className='mb-2'>URL Foto</FormLabel>
               <FormControl>
                 <Input
                   type='file'

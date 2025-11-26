@@ -17,20 +17,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-
-interface Product {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  stock: number;
-  imageUrl?: string;
-  sellerId: string;
-  seller?: string;
-}
+import { ProductTypes } from "@/lib/types";
 
 const Dashboard = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductTypes[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { token, logout } = useAuthStore();
   const router = useRouter();
@@ -135,8 +125,10 @@ const Dashboard = () => {
                     <Image
                       src={item.imageUrl}
                       alt={item.name}
-                      fill
+                      width={300}
+                      height={300}
                       className='object-cover'
+                      priority
                     />
                   ) : (
                     <div className='w-full h-full flex justify-center items-center text-xs text-gray-500'>
@@ -149,7 +141,10 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className='flex justify-between font-medium'>
-                  <span> Stock : {item.stock}</span>
+                  <span>
+                    {" "}
+                    Stok : {item.stock} {item.unit}
+                  </span>
                   <span className='text-green-600'>
                     Rp{item.price.toLocaleString("id-ID")}
                   </span>
@@ -157,9 +152,7 @@ const Dashboard = () => {
                 <div className='mt-4 space-x-2 flex'>
                   {" "}
                   <Link key={item.id} href={`/dashboard/edit/${item.id}`}>
-                    <Button variant='secondary'>
-                      Edit
-                    </Button>
+                    <Button variant='secondary'>Edit</Button>
                   </Link>
                   <DeleteButton
                     title={item.name}
