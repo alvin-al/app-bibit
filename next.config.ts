@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         port: "4000",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "http",
+        hostname: "app-bibit-be-production.up.railway.app",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

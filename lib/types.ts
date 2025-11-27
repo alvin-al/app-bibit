@@ -6,8 +6,11 @@ export interface ProductTypes {
   stock: number;
   imageUrl?: string;
   sellerId: string;
-  seller?: string;
   age: string | null;
   unit: string;
   varieties: string;
+  seller?: {
+    name: string | null;
+    email: string;
+  };
 }
