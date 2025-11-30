@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         hostname: "app-bibit-be-production.up.railway.app",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/dpeupdhin/image/upload/**",
+      },
     ],
   },
 };

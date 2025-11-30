@@ -124,14 +124,7 @@ const Dashboard = () => {
               <CardHeader>
                 <div className='w-32 h-32 mb-4 border rounded-lg overflow-hidden relative'>
                   {item.imageUrl ? (
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      width={300}
-                      height={300}
-                      className='object-cover'
-                      priority
-                    />
+                    <Image src={item.imageUrl} alt={item.name} fill priority />
                   ) : (
                     <div className='w-full h-full flex justify-center items-center text-xs text-gray-500'>
                       No Image

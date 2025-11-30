@@ -101,6 +101,7 @@ const EditProductPage = () => {
 
   //onsubmit
   const onSubmit = async (values: z.infer<typeof productSchema>) => {
+    setIsLoading(true);
     try {
       let finalImageUrl = values.imageUrl;
 
