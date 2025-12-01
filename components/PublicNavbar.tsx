@@ -35,7 +35,9 @@ const PublicNavbar = () => {
 
   return (
     <div className='flex h-16 items-center justify-between px-8 shadow bg-white'>
-      <div className='font-semibold'>Berbenih</div>{" "}
+      <Link href={"/"}>
+        <div className='font-semibold'>Berbenih</div>{" "}
+      </Link>
       <div>{token ? afterLoginButton : notLoginButton}</div>
     </div>
   );
