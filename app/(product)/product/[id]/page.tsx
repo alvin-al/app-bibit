@@ -1,5 +1,4 @@
 "use client";
-import { Spinner } from "@/components/ui/spinner";
 import { ProductTypes } from "@/lib/types";
 import axios from "axios";
 import Image from "next/image";
@@ -8,14 +7,14 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const page = () => {
+const ProductDetails = () => {
   const [product, setProduct] = useState<ProductTypes | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { id } = useParams();
 
   //fetch data API
   useEffect(() => {
-    const fetchData = async (id: string) => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/products/public/${id}`
@@ -32,7 +31,7 @@ const page = () => {
       }
     };
 
-    fetchData(id);
+    fetchData();
   }, [id]);
 
   return (
@@ -53,4 +52,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default ProductDetails;
