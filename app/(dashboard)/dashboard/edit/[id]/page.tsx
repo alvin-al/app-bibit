@@ -136,8 +136,9 @@ const EditProductPage = () => {
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.message);
+      } else {
+        toast.error("Terjadi kesalahan");
       }
-      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
