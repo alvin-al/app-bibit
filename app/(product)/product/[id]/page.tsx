@@ -70,7 +70,7 @@ const ProductDetails = () => {
       <div className='my-4 space-y-2'>
         <p className='text-2xl font-bold'>{product?.name}</p>
         <p className='text-2xl text-green-700 font-semibold space-x-1'>
-          Rp{product?.price}
+          Rp{product?.price.toLocaleString("ID-id")}
           <span className='text-sm text-gray-500'>/{product?.unit}</span>
         </p>
         <div className='flex items-center gap-2 mb-1 font-normal'>
