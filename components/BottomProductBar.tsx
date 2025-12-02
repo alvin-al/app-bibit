@@ -4,7 +4,7 @@ import { FaShareAlt, FaShoppingCart } from "react-icons/fa";
 
 const BottomProductBar = () => {
   return (
-    <div className='w-full h-14 absolute bottom-0 border border-gray-200 shadow flex items-center space-x-1 p-4 z-0'>
+    <div className='w-full h-14 absolute bottom-0 border border-gray-200 shadow flex items-center space-x-1 p-4 z-0 bg-white'>
       <Button className='flex-auto'>Beli</Button>
       <Button variant='outline'>
         <FaShoppingCart />
