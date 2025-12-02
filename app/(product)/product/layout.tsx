@@ -2,7 +2,6 @@ import BottomProductBar from "@/components/BottomProductBar";
 import PublicNavbar from "@/components/PublicNavbar";
 import React from "react";
 
-
 export default function page({
   children,
 }: Readonly<{
@@ -11,11 +10,14 @@ export default function page({
   return (
     <>
       {" "}
-      <div className='top-0 sticky z-10'>
+      <div className='top-0 sticky z-50'>
         <PublicNavbar />
       </div>
       <div className='p-4'>{children}</div>
-      <BottomProductBar />
+      <div className='bottom-0 sticky z-50'>
+        {" "}
+        <BottomProductBar />
+      </div>
     </>
   );
 }
