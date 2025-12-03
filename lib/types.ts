@@ -14,3 +14,7 @@ export interface ProductTypes {
     email: string;
   };
 }
+
+export interface CartItem extends ProductTypes {
+  quantity: number;
+}

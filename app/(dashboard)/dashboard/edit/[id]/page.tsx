@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { productSchema } from "@/lib/schemas/productSchema";
+import { useCartStore } from "@/lib/store/cartStore";
 
 const EditProductPage = () => {
   //state
@@ -29,6 +30,7 @@ const EditProductPage = () => {
   const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
   const { id } = useParams();
+  const { addItem } = useCartStore();
 
   //setup RHF
   const form = useForm({
