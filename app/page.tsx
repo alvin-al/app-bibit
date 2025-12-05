@@ -12,6 +12,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { FaStore, FaStar } from "react-icons/fa";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import BottomNavbar from "@/components/BottomNavbar";
 
 export default function Home() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -50,12 +51,11 @@ export default function Home() {
 
   return (
     <main>
-      {" "}
-      <div className='top-0 sticky z-10'>
+      <div className='top-0 sticky z-50'>
         <PublicNavbar />
       </div>
       {/* All data */}
-      <div className='p-4'>
+      <div className='p-4 min-h-screen'>
         <div>
           <div className='mb-4 flex items-center space-x-2'>
             <div className='absolute pl-3'>
@@ -145,6 +145,10 @@ export default function Home() {
             ))}
           </div>
         )}
+      </div>
+      {/* Bottom navbar */}
+      <div className='bottom-0 sticky z-50'>
+        <BottomNavbar />
       </div>
     </main>
   );
