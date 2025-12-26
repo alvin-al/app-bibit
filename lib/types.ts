@@ -17,4 +17,7 @@ export interface ProductTypes {
 
 export interface CartItem extends ProductTypes {
   quantity: number;
+  addCartAt: string;
+  isSelected: boolean;
+  isChecked: boolean;
 }

@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const PublicNavbar = () => {
   return (
-    <div className='flex h-16 items-center justify-between px-8 shadow bg-white'>
+    <div className='flex h-16 items-center justify-between px-4 shadow bg-white'>
       <Link href={"/"}>
         <div className='font-semibold'>Berbenih</div>{" "}
       </Link>

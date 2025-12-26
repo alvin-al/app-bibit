@@ -11,6 +11,8 @@ interface CartStoreTypes {
   clearCart: () => void;
   totalItem: () => number;
   totalPrice: () => number;
+  toggleSelect: (id: string) => void;
+  toggleSelectAll: (isSelected: boolean) => void;
 }
 
 export const useCartStore = create<CartStoreTypes>()(
@@ -18,6 +20,7 @@ export const useCartStore = create<CartStoreTypes>()(
     (set, get) => ({
       // store item
       items: [],
+      addCartAt: new Date().toISOString(),
 
       // add
       addItem: (product) => {
@@ -25,18 +28,23 @@ export const useCartStore = create<CartStoreTypes>()(
         const existingItem = currentItems.find(
           (item) => item.id === product.id
         );
+        const now = new Date().toISOString();
 
         if (existingItem) {
           const updateItems = currentItems.map((item) =>
             item.id === product.id
-              ? { ...item, quantity: item.quantity + 1 }
+              ? { ...item, quantity: item.quantity + 1, addCartAt: now }
               : item
           );
 
           set({ items: updateItems });
           toast.success("Jumlah barang ditambah");
         } else {
-          const newItem = { ...product, quantity: 1 };
+          const newItem = {
+            ...product,
+            quantity: 1,
+            addCartAt: now,
+          };
 
           set({
             items: [...currentItems, newItem],
@@ -47,13 +55,20 @@ export const useCartStore = create<CartStoreTypes>()(
 
       //remove
       removeItem: (id) => {
-        set({ items: get().items.filter((item) => item.id !== id) });
+        set({
+          items: get().items.filter((item) => item.id !== id),
+        });
         toast.success("Barang dihapus");
       },
 
       //update quantity
       updateQuantity: (id, qty) => {
-        if (qty < 1) return;
+        const now = new Date().toISOString();
+
+        if (qty < 1) {
+          set({ items: get().items.filter((item) => item.id !== id) });
+          toast.success("Barang dihapus");
+        }
 
         set({
           items: get().items.map((item) =>
@@ -75,6 +90,25 @@ export const useCartStore = create<CartStoreTypes>()(
           (total, item) => total + item.price * item.quantity,
           0
         ),
+
+      // toggle per item
+      toggleSelect: (id) => {
+        set({
+          items: get().items.map((item) =>
+            item.id === id ? { ...item, isSelected: !item.isSelected } : item
+          ),
+        });
+      },
+
+      // toggle semua (misal tombol pilih semua di atas)
+      toggleSelectAll: (isSelected) => {
+        set({
+          items: get().items.map((item) => ({
+            ...item,
+            isSelected: isSelected,
+          })),
+        });
+      },
     }),
     {
       name: "cart-storage",
